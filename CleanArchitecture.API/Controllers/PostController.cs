@@ -36,7 +36,8 @@ namespace CleanArchitecture.API.Controllers
                     DisplayName = post.DisplayName,
                     UserName = post.UserName,
                     PhotoUrl = post.PhotoUrl,
-                    Title = post.Title
+                    Title = post.Title,
+                    PostedOn = post.CreatedUtc.ToShortDateString()
                 };
                 viewModelList.Add(postViewModel);
             }

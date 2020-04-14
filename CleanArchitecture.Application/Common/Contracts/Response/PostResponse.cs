@@ -1,3 +1,5 @@
+using System;
+
 namespace CleanArchitecture.Application.Common.Contracts.Response
 {
     public class PostResponse
@@ -8,5 +10,6 @@ namespace CleanArchitecture.Application.Common.Contracts.Response
         public string PhotoUrl { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string PostedOn { get; set; }
     }
 }
