@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store/rootReducer';
 import { Segment, Header, Container, Item } from 'semantic-ui-react';
-import { IPostState } from '../../app/models/Post';
+// import { IPostState } from '../../app/models/Post';
 import Post from './Post';
 
 interface IProps { }
