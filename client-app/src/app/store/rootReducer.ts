@@ -1,10 +1,10 @@
-import { combineReducers } from '@reduxjs/toolkit'
-import postReducer from './reducers/postSlice'
+import { combineReducers } from '@reduxjs/toolkit';
+import postReducer from './reducers/postSlice';
 
 const rootReducer = combineReducers({
   postState: postReducer
-})
+});
 
-export type RootState = ReturnType<typeof rootReducer>
+export type RootState = ReturnType<typeof rootReducer>;
 
-export default rootReducer
+export default rootReducer;

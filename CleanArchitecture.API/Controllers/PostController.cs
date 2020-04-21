@@ -14,61 +14,61 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.API.Controllers
 {
-    public class PostController : BaseController
-    {
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostResponse>>> List([FromQuery]PaginationRequest request)
-        {
-            var posts = await Mediator.Send(new GetPostsQuery()
+   public class PostController : ApiController
+   {
+      [HttpGet]
+      public async Task<ActionResult<IEnumerable<PostResponse>>> List([FromQuery]PaginationRequest request)
+      {
+         var posts = await Mediator.Send(new GetPostsQuery()
+         {
+            CurrentPage = request.CurrentPage,
+            PageSize = request.PageSize
+         });
+
+         var viewModelList = new List<PostResponse>();
+
+         foreach (var post in posts)
+         {
+            var postViewModel = new PostResponse
             {
-                CurrentPage = request.CurrentPage,
-                PageSize = request.PageSize
-            });
+               Id = post.Id.ToString(),
+               Content = post.Content,
+               DisplayName = post.DisplayName,
+               UserName = post.UserName,
+               PhotoUrl = post.PhotoUrl,
+               Title = post.Title,
+               PostedOn = post.Created.ToShortDateString()
+            };
+            viewModelList.Add(postViewModel);
+         }
 
-            var viewModelList = new List<PostResponse>();
+         Response.AddPagination(posts.CurrentPage, posts.PageSize, posts.TotalCount, posts.TotalPages);
+         return Ok(viewModelList);
+      }
 
-            foreach (var post in posts)
-            {
-                var postViewModel = new PostResponse
-                {
-                    Id = post.Id.ToString(),
-                    Content = post.Content,
-                    DisplayName = post.DisplayName,
-                    UserName = post.UserName,
-                    PhotoUrl = post.PhotoUrl,
-                    Title = post.Title,
-                    PostedOn = post.CreatedUtc.ToShortDateString()
-                };
-                viewModelList.Add(postViewModel);
-            }
+      [HttpGet("{id}")]
+      public async Task<ActionResult<PostResponse>> Detail([FromRoute]Guid id)
+      {
+         return await Mediator.Send(new GetPostDetailQuery() { Id = id });
+      }
 
-            Response.AddPagination(posts.CurrentPage, posts.PageSize, posts.TotalCount, posts.TotalPages);
-            return Ok(viewModelList);
-        }
+      [HttpPost]
+      public async Task<ActionResult<Guid>> Create(CreatePostCommand command)
+      {
+         return await Mediator.Send(command);
+      }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PostResponse>> Detail([FromRoute]Guid id)
-        {
-            return await Mediator.Send(new GetPostDetailQuery() { Id = id });
-        }
+      [HttpPut("{id}")]
+      public async Task<ActionResult<Unit>> Edit([FromRoute]Guid id, UpdatePostCommand command)
+      {
+         command.Id = id;
+         return await Mediator.Send(command);
+      }
 
-        [HttpPost]
-        public async Task<ActionResult<Unit>> Create(CreatePostCommand command)
-        {
-            return await Mediator.Send(command);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult<Unit>> Edit([FromRoute]Guid id, UpdatePostCommand command)
-        {
-            command.Id = id;
-            return await Mediator.Send(command);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Unit>> Delete([FromRoute]Guid id)
-        {
-            return await Mediator.Send(new DeletePostCommand() { Id = id });
-        }
-    }
+      [HttpDelete("{id}")]
+      public async Task<ActionResult<Unit>> Delete([FromRoute]Guid id)
+      {
+         return await Mediator.Send(new DeletePostCommand() { Id = id });
+      }
+   }
 }

@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
-import { IPost, IPostState } from '../models/Post'
-import logger from 'redux-logger'
+// eslint-disable-next-line object-curly-newline
+import { createSlice, PayloadAction, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { logger } from 'redux-logger';
+import { IPost, IPostState } from '../models/Post';
 
 const initialState: IPostState = {
   posts: [
@@ -36,47 +37,47 @@ const initialState: IPostState = {
     }
   ],
   post: null
-}
+};
 
 const postSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
     detail: (state, { payload }: PayloadAction<{ id: string }>) => {
-      const selectedPost = state.posts.find((post) => post.id === payload.id)
-      if (selectedPost) state.post = selectedPost
+      const selectedPost = state.posts.find((post) => post.id === payload.id);
+      if (selectedPost) state.post = selectedPost;
     },
     create: (state, { payload }: PayloadAction<IPost>) => {
-      state.posts.push(payload)
+      state.posts.push(payload);
     },
     edit: (state, { payload }: PayloadAction<IPost>) => {
-      const postToEdit = state.posts.find((post) => post.id === payload.id)
+      const postToEdit = state.posts.find((post) => post.id === payload.id);
       if (postToEdit) {
-        postToEdit.displayName = payload.displayName
-        postToEdit.userName = payload.userName
-        postToEdit.photoUrl = payload.photoUrl
-        postToEdit.title = payload.title
-        postToEdit.content = payload.content
+        postToEdit.displayName = payload.displayName;
+        postToEdit.userName = payload.userName;
+        postToEdit.photoUrl = payload.photoUrl;
+        postToEdit.title = payload.title;
+        postToEdit.content = payload.content;
       }
     },
     delete: (state, { payload }: PayloadAction<{ id: string }>) => {
-      const index = state.posts.findIndex((p) => p.id === payload.id)
-      if (index > -1) state.posts.splice(index, 1)
+      const index = state.posts.findIndex((p) => p.id === payload.id);
+      if (index > -1) state.posts.splice(index, 1);
     }
   }
-})
+});
 
 export const {
   detail: detailPostActionCreator,
   create: createPostActionCreator,
   edit: editPostActionCreator,
   delete: removePostActionCreator
-} = postSlice.actions
+} = postSlice.actions;
 
-const middleware = [...getDefaultMiddleware(), logger]
+const middleware = [...getDefaultMiddleware(), logger];
 
 export default configureStore({
   reducer: postSlice.reducer,
   middleware,
   devTools: process.env.NODE_ENV !== 'production'
-})
+});
