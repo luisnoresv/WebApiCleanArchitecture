@@ -1,5 +1,5 @@
-.vscode
 bin
 obj
 *.db
-node_modules
+CleanArchitecture.Infrastructure/Persistence/Migrations
+
