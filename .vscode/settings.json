@@ -1,5 +1,10 @@
 {
-  "eslint.validate": ["javascript", "javascriptreact"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "eslint.workingDirectories": [
     { "directory": "./client-app", "changeProcessCWD": true }
   ]

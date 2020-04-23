@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Application.Common.Constants;
 using CleanArchitecture.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,18 +9,91 @@ namespace CleanArchitecture.Infrastructure.Persistence
 {
    public static class ApplicationDbContextSeed
    {
-      public static async Task SeedData(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+      public static async Task SeedData(ApplicationDbContext context, UserManager<ApplicationUser> userManager,
+         RoleManager<IdentityRole> roleManager)
       {
-         await SeedUserAsync(userManager);
+         await CreateUsers(userManager);
+         await CreateRoles(context, userManager, roleManager);
+         await CreateAdminUser(userManager);
          await AddSamplePosts(context);
       }
 
-      private static async Task SeedUserAsync(UserManager<ApplicationUser> userManager)
+      private static async Task CreateUsers(UserManager<ApplicationUser> userManager)
       {
          if (!userManager.Users.Any())
          {
-            var appUser = new ApplicationUser { UserName = "admin", Email = "admin@localhost.com" };
-            await userManager.CreateAsync(appUser);
+            var users = new List<ApplicationUser>()
+            {
+               new ApplicationUser
+               {
+                  UserName ="john.doe",
+                  Email ="john@test.com"
+               },
+               new ApplicationUser
+               {
+                  UserName ="jane.doe",
+                  Email ="jane@test.com"
+               }
+            };
+
+            foreach (var user in users)
+            {
+               await userManager.CreateAsync(user, "P@ssw0rd");
+            }
+         }
+      }
+      private static async Task CreateAdminUser(UserManager<ApplicationUser> userManager)
+      {
+         // Create Admin user
+         var existAdmin = userManager.FindByNameAsync("Admin").Result;
+
+         if (existAdmin == null)
+         {
+            var adminUser = new ApplicationUser
+            {
+               UserName = "Admin",
+               Email = "admin@cookbook.com"
+            };
+
+            IdentityResult result = userManager.CreateAsync(adminUser, "P@ssw0rd").Result;
+
+            if (result.Succeeded)
+            {
+               var admin = userManager.FindByNameAsync("Admin").Result;
+               await userManager.AddToRolesAsync(admin, new[] { GlobalConstants.ADMIN_ROLE, GlobalConstants.MODERATOR_ROLE });
+            }
+         }
+      }
+
+      private static async Task CreateRoles(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+      {
+         if (!roleManager.Roles.Any())
+         {
+            var roles = new List<IdentityRole>
+               {
+                  new IdentityRole{ Name = GlobalConstants.ADMIN_ROLE},
+                  new IdentityRole{ Name = GlobalConstants.MODERATOR_ROLE},
+                  new IdentityRole{Name = GlobalConstants.MEMBER_ROLE}
+               };
+
+            foreach (var role in roles)
+            {
+               await roleManager.CreateAsync(role);
+            }
+
+            await AddUsersToRole(context, userManager);
+         }
+      }
+
+      private static async Task AddUsersToRole(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+      {
+         // Add Users To Roles
+         if (userManager.Users.Any())
+         {
+            foreach (var user in context.Users.ToList())
+            {
+               await userManager.AddToRoleAsync(user, GlobalConstants.MEMBER_ROLE);
+            }
          }
       }
 

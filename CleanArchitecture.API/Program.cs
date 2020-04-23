@@ -22,11 +22,15 @@ namespace CleanArchitecture.API
             var services = scope.ServiceProvider;
             try
             {
-               var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                var context = services.GetRequiredService<ApplicationDbContext>();
+               // UserManager
+               var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+               // // Adding Roles
+               var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
                context.Database.Migrate();
                // Apply Seed
-               await ApplicationDbContextSeed.SeedData(context, userManager);
+               await ApplicationDbContextSeed.SeedData(context, userManager, roleManager);
             }
             catch (Exception ex)
             {
@@ -39,7 +43,7 @@ namespace CleanArchitecture.API
       }
 
       public static IHostBuilder CreateHostBuilder(string[] args) =>
-          Host.CreateDefaultBuilder(args)
+         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
                webBuilder.UseStartup<Startup>();

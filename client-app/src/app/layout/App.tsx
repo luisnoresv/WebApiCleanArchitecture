@@ -3,7 +3,7 @@ import './App.css';
 import PostList from '../../components/post/PostList';
 
 const App = () => (
-  <PostList />
+   <PostList />
 );
 
 export default App;
