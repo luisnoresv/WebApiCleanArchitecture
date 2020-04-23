@@ -9,7 +9,7 @@ namespace CleanArchitecture.IntegrationTest.Posts.Commands
 {
    using static SetupTestEnvironment;
 
-   public class CreatePostTest : TestBase
+   public class CreatePostTests : TestBase
    {
       [Test]
       public void ShouldRequireMinimunFields()

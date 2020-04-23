@@ -10,27 +10,27 @@ using MediatR;
 
 namespace CleanArchitecture.Application.Posts.Commands.DeletePost
 {
-    public class DeletePostCommandHandler : IRequestHandler<DeletePostCommand>
-    {
-        private readonly IApplicationDbContext _context;
-        public DeletePostCommandHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
+   public class DeletePostCommandHandler : IRequestHandler<DeletePostCommand>
+   {
+      private readonly IApplicationDbContext _context;
+      public DeletePostCommandHandler(IApplicationDbContext context)
+      {
+         _context = context;
+      }
 
-        public async Task<Unit> Handle(DeletePostCommand request, CancellationToken cancellationToken)
-        {
-            var entity = await _context.Set<Post>().FindAsync(request.Id);
+      public async Task<Unit> Handle(DeletePostCommand request, CancellationToken cancellationToken)
+      {
+         var entity = await _context.Set<Post>().FindAsync(request.Id);
 
-            if (entity == null) throw new RestException(HttpStatusCode.NotFound, new { Post = GlobalConstants.NOT_FOUND });
+         if (entity == null) throw new RestException(HttpStatusCode.NotFound, new { Post = GlobalConstants.NOT_FOUND });
 
-            _context.Set<Post>().Remove(entity);
+         _context.Set<Post>().Remove(entity);
 
-            var success = await _context.SaveChangesAsync(cancellationToken) > 0;
+         var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
-            if (success) return Unit.Value;
+         if (success) return Unit.Value;
 
-            throw new Exception(GlobalConstants.ERROR_SAVING_CHANGES);
-        }
-    }
+         throw new Exception(GlobalConstants.ERROR_SAVING_CHANGES);
+      }
+   }
 }
