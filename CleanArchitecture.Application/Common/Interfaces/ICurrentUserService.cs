@@ -1,7 +1,8 @@
 namespace CleanArchitecture.Application.Common.Interfaces
 {
-    public interface ICurrentUserService
-    {
-        string GetCurrentUserName();
-    }
+   public interface ICurrentUserService
+   {
+      string GetCurrentUserName();
+      string GetCurrentUserId();
+   }
 }

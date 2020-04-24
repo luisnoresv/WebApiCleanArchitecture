@@ -14,6 +14,8 @@ namespace CleanArchitecture.IntegrationTest.Posts.Queries
       public async Task ShouldReturnAsociatedPostsPaging()
       {
          // Arrange
+         await RunAsDefaultUserAsync();
+
          var addedPost = await AddAsync(new Post
          {
             DisplayName = "Test1",
@@ -23,22 +25,27 @@ namespace CleanArchitecture.IntegrationTest.Posts.Queries
             Content = "Test1 Content for GetPostQueryTest"
          });
 
-
          var query = new GetPostsQuery() { CurrentPage = 0, PageSize = 4 };
+
          // Act
-         var result = await SendAsync(query);
+         var postPagingResult = await SendAsync(query);
 
          // Assert
-         result.Should().NotBeNull();
-         result.TotalCount.Should().Be(1);
-         result.CurrentPage.Should().Be(1);
-         result.PageSize.Equals(1);
-         result.TotalPages.Equals(1);
-         result[0].DisplayName.Should().Be(addedPost.DisplayName);
-         result[0].UserName.Should().Be(addedPost.UserName);
-         result[0].PhotoUrl.Should().Be(addedPost.PhotoUrl);
-         result[0].Title.Should().Be(addedPost.Title);
-         result[0].Content.Should().Be(addedPost.Content);
+         foreach (var postItem in postPagingResult)
+         {
+            postItem.DisplayName.Should().Be(addedPost.DisplayName);
+            postItem.UserName.Should().Be(addedPost.UserName);
+            postItem.PhotoUrl.Should().Be(addedPost.PhotoUrl);
+            postItem.Title.Should().Be(addedPost.Title);
+            postItem.Content.Should().Be(addedPost.Content);
+         }
+
+         postPagingResult.Should().NotBeNull();
+         postPagingResult.TotalCount.Should().Be(1);
+         postPagingResult.CurrentPage.Should().Be(1);
+         postPagingResult.PageSize.Should().Be(3);
+         postPagingResult.TotalPages.Should().Be(1);
+
       }
    }
 }

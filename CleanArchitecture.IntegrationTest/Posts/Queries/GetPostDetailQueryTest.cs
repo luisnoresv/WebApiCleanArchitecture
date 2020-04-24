@@ -1,8 +1,6 @@
 using System;
-using System.Net;
 using System.Threading.Tasks;
-using CleanArchitecture.Application.Common.Constants;
-using CleanArchitecture.Application.Common.Error;
+using CleanArchitecture.Application.Common.Exceptions;
 using CleanArchitecture.Application.Posts.Queries.GetPostDetail;
 using CleanArchitecture.Domain.Entities;
 using FluentAssertions;
@@ -18,6 +16,8 @@ namespace CleanArchitecture.IntegrationTest.Posts.Queries
       public async Task ShouldReturnAsociatedPostsDetail()
       {
          // Arrange
+         await RunAsDefaultUserAsync();
+
          var firstPost = await AddAsync(new Post
          {
             DisplayName = "Test1",
@@ -52,8 +52,9 @@ namespace CleanArchitecture.IntegrationTest.Posts.Queries
       }
 
       [Test]
-      public void ShouldReturnExceptionOnInvalidRequest()
+      public async Task ShouldReturnExceptionOnInvalidRequest()
       {
+         await RunAsDefaultUserAsync();
          // Arrange
          var query = new GetPostDetailQuery() { Id = new Guid() };
 

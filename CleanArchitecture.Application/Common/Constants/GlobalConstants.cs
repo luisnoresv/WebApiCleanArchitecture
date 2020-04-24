@@ -21,6 +21,7 @@ namespace CleanArchitecture.Application.Common.Constants
       // Errors
       public const string REST_ERROR = "REST ERROR";
       public const string SERVER_ERROR = "SERVER ERROR";
+      public const string VALIDATION_ERROR = "VALIDATION_ERROR";
 
       // FluentApiErrors
       public const string DEFAULT_VALIDATION_MESSAGE = "One or more validation failures have occurred.";

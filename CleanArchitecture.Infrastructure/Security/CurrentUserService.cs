@@ -13,6 +13,11 @@ namespace CleanArchitecture.Infrastructure.Security
       }
       public string GetCurrentUserName()
       {
+         return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+      }
+
+      public string GetCurrentUserId()
+      {
          return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
       }
    }

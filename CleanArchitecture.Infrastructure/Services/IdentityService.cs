@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Application.Common.Constants;
 using CleanArchitecture.Application.Common.Contracts.Request;
 using CleanArchitecture.Application.Common.Contracts.Response;
-using CleanArchitecture.Application.Common.Error;
+using CleanArchitecture.Application.Common.Exceptions;
 using CleanArchitecture.Application.Common.Interfaces;
 using CleanArchitecture.Domain.Entities;
 using Microsoft.AspNetCore.Identity;

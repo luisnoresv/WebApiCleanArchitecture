@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using CleanArchitecture.Application.Common.Exceptions;
 using CleanArchitecture.Application.Posts.Commands.CreatePost;
 using CleanArchitecture.Domain.Entities;
 using FluentAssertions;
@@ -12,12 +13,14 @@ namespace CleanArchitecture.IntegrationTest.Posts.Commands
    public class CreatePostTests : TestBase
    {
       [Test]
-      public void ShouldRequireMinimunFields()
+      public async Task ShouldRequireMinimunFields()
       {
+         await RunAsDefaultUserAsync();
+
          var command = new CreatePostCommand();
 
          FluentActions.Invoking(() => SendAsync(command))
-            .Should().Throw<Exception>();
+            .Should().Throw<ValidationException>();
       }
 
       [Test]

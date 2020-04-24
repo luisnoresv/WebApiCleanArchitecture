@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using CleanArchitecture.Application.Common.Exceptions;
 using CleanArchitecture.Application.Posts.Commands.CreatePost;
 using CleanArchitecture.Application.Posts.Commands.DeletePost;
 using CleanArchitecture.Domain.Entities;
@@ -13,17 +14,20 @@ namespace CleanArchitecture.IntegrationTest.Posts.Commands
    public class DeletePostTests : TestBase
    {
       [Test]
-      public void ShouldRequireMinimunFields()
+      public async Task ShouldRequireMinimunFields()
       {
+         await RunAsDefaultUserAsync();
          var command = new DeletePostCommand();
 
          FluentActions.Invoking(() => SendAsync(command))
-            .Should().Throw<Exception>();
+            .Should().Throw<ValidationException>();
       }
 
       [Test]
       public async Task ShouldDeleteSelectedPost()
       {
+         await RunAsDefaultUserAsync();
+
          var postId = await SendAsync(new CreatePostCommand
          {
             DisplayName = "userName",

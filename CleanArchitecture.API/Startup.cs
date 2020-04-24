@@ -1,6 +1,8 @@
 using System;
+using System.Reflection;
 using System.Text;
 using CleanArchitecture.API.Middleware;
+using CleanArchitecture.Application.Common.Behaviours;
 using CleanArchitecture.Application.Common.Constants;
 using CleanArchitecture.Application.Common.Interfaces;
 using CleanArchitecture.Application.Posts.Commands.CreatePost;
@@ -9,6 +11,7 @@ using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Infrastructure.Persistence;
 using CleanArchitecture.Infrastructure.Security;
 using CleanArchitecture.Infrastructure.Services;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -67,16 +70,21 @@ namespace CleanArchitecture.API
             });
 
          services.AddMediatR(typeof(GetPostDetailQueryHandler).Assembly);
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
 
          services.AddControllers(opt =>
          {
             // Add Authorization Policy for endpoints
             var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
             opt.Filters.Add(new AuthorizeFilter(policy));
-         })
-            // Adding FluentValidation
-            .AddFluentValidation(cfg =>
-            cfg.RegisterValidatorsFromAssemblyContaining<CreatePostCommandValidator>());
+         });
+         // Adding FluentValidation
+         // .AddFluentValidation(cfg =>
+         // cfg.RegisterValidatorsFromAssemblyContaining<CreatePostCommandValidator>());
+
+         services.AddValidatorsFromAssemblyContaining<CreatePostCommandValidator>();
 
          // Identity Configuration
          var builder = services.AddIdentityCore<ApplicationUser>();

@@ -19,6 +19,7 @@ using Respawn;
 
 namespace CleanArchitecture.IntegrationTest
 {
+
    [SetUpFixture]
    public class SetupTestEnvironment
    {
@@ -49,13 +50,23 @@ namespace CleanArchitecture.IntegrationTest
 
          // Replace service registration for ICurrentUserService
          // Remove existing registration
-         var currentUserServiceDescriptor = services.FirstOrDefault(d => d
-            .ServiceType == typeof(ICurrentUserService));
+         var currentUserServiceDescriptor = services.FirstOrDefault(d =>
+            d.ServiceType == typeof(ICurrentUserService));
 
          services.Remove(currentUserServiceDescriptor);
 
+         var tokenServiceDescriptor = services.FirstOrDefault(d =>
+            d.ServiceType == typeof(ITokenService));
+
+         services.Remove(tokenServiceDescriptor);
          // Register Testing Version
-         services.AddTransient(provider => Mock.Of<ICurrentUserService>(s => s.GetCurrentUserName() == _currentUserName));
+         var mockUser = new Mock<ApplicationUser>();
+
+         services.AddTransient(provider =>
+            Mock.Of<ICurrentUserService>(s => s.GetCurrentUserName() == _currentUserName));
+
+         services.AddTransient(provider =>
+                     Mock.Of<ITokenService>(s => s.CreateToken(mockUser.Object) == Task.FromResult(TestConstants.TOKEN)));
 
          _scopeFactory = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
 
@@ -87,7 +98,7 @@ namespace CleanArchitecture.IntegrationTest
          return await RunAsUserAsync("admin", "P@ssw0rd");
       }
 
-      public static async Task<string> RunAsUserAsync(string userName, string password)
+      private static async Task<string> RunAsUserAsync(string userName, string password)
       {
          using var scope = _scopeFactory.CreateScope();
 

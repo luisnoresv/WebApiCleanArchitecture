@@ -28,9 +28,9 @@ namespace CleanArchitecture.Application.Posts.Commands.CreatePost
 
          _context.Set<Post>().Add(entity);
 
-         var success = await _context.SaveChangesAsync(cancellationToken) > 0;
+         await _context.SaveChangesAsync(cancellationToken);
 
-         if (success) return entity.Id;
+         return entity.Id;
 
          throw new Exception(GlobalConstants.ERROR_SAVING_CHANGES);
       }
