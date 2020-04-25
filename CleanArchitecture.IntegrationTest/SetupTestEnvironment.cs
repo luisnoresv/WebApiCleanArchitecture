@@ -46,7 +46,7 @@ namespace CleanArchitecture.IntegrationTest
             w.ApplicationName == GlobalConstants.APPLICATION_NAME &&
             w.EnvironmentName == GlobalConstants.ENVIRONMENT_NAME));
 
-         startup.ConfigureDevelopmentServices(services);
+         startup.ConfigureServices(services);
 
          // Replace service registration for ICurrentUserService
          // Remove existing registration

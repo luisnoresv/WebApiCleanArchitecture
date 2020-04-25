@@ -1,26 +1,14 @@
 using System;
-using System.Reflection;
 using System.Text;
 using CleanArchitecture.API.Middleware;
-using CleanArchitecture.Application.Common.Behaviours;
+using CleanArchitecture.Application;
 using CleanArchitecture.Application.Common.Constants;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Application.Posts.Commands.CreatePost;
-using CleanArchitecture.Application.Posts.Queries.GetPostDetail;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Infrastructure.Persistence;
-using CleanArchitecture.Infrastructure.Security;
-using CleanArchitecture.Infrastructure.Services;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using MediatR;
+using CleanArchitecture.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -36,27 +24,11 @@ namespace CleanArchitecture.API
 
       public IConfiguration Configuration { get; }
 
-      public void ConfigureProductionServices(IServiceCollection services)
-      {
-         services.AddDbContext<ApplicationDbContext>(opt =>
-                     {
-                        opt.UseSqlServer(Configuration.GetConnectionString(GlobalConstants.EF_CONNECTION_STRING));
-                     });
-         ConfigureServices(services);
-      }
-
-      public void ConfigureDevelopmentServices(IServiceCollection services)
-      {
-         services.AddDbContext<ApplicationDbContext>(opt =>
-                     {
-                        opt.UseSqlServer(Configuration.GetConnectionString(GlobalConstants.EF_CONNECTION_STRING));
-                     });
-         ConfigureServices(services);
-      }
-
       // This method gets called by the runtime. Use this method to add services to the container.
       public void ConfigureServices(IServiceCollection services)
       {
+         services.AddApplication();
+         services.AddInfrastructure(Configuration);
          // Adding cors policy
          services.AddCors(opt =>
             {
@@ -69,32 +41,12 @@ namespace CleanArchitecture.API
                   });
             });
 
-         services.AddMediatR(typeof(GetPostDetailQueryHandler).Assembly);
-         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
-         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
-         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-
          services.AddControllers(opt =>
          {
             // Add Authorization Policy for endpoints
             var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
             opt.Filters.Add(new AuthorizeFilter(policy));
          });
-         // Adding FluentValidation
-         // .AddFluentValidation(cfg =>
-         // cfg.RegisterValidatorsFromAssemblyContaining<CreatePostCommandValidator>());
-
-         services.AddValidatorsFromAssemblyContaining<CreatePostCommandValidator>();
-
-         // Identity Configuration
-         var builder = services.AddIdentityCore<ApplicationUser>();
-         // To Add Identity
-         var identityBuilder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
-         identityBuilder.AddEntityFrameworkStores<ApplicationDbContext>();
-         //  Add Login and Sign In Manager services
-         identityBuilder.AddSignInManager<SignInManager<ApplicationUser>>();
-         // Add Role Manager Service
-         identityBuilder.AddRoleManager<RoleManager<IdentityRole>>();
 
          // Policies to handle Roles
          services.AddAuthorization(opt =>
@@ -120,11 +72,6 @@ namespace CleanArchitecture.API
                   ClockSkew = TimeSpan.Zero
                };
             });
-
-         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-         services.AddScoped<ICurrentUserService, CurrentUserService>();
-         services.AddScoped<IIdentityService, IdentityService>();
-         services.AddScoped<ITokenService, TokenService>();
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
