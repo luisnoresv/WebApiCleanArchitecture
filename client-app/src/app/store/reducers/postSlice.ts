@@ -1,75 +1,70 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { IErrorResponse } from '../../models/Errors';
+import PostService from '../../api/postService';
+import { IPagination } from '../../models/Pagination';
 import { IPostState, IPost } from '../../models/Post';
 
 const initialState: IPostState = {
-  posts: [
-    {
-      id: 'ebf8f6f1-8cd1-431d-94cf-caa8d8f4fc17',
-      displayName: 'Ander',
-      userName: '@ander27',
-      photoUrl: 'https://randomuser.me/api/portraits/men/19.jpg',
-      title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-      content:
-        'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto',
-      postedOn: '27/09/2019'
-    },
-    {
-      id: 'df00321d-4db3-4c6c-bd4b-2f920c47de99',
-      displayName: 'Michael',
-      userName: '@deadHorse',
-      photoUrl: 'https://randomuser.me/api/portraits/men/31.jpg',
-      title: 'qui est esse',
-      content:
-        'est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla',
-      postedOn: '13/04/2020'
-    },
-    {
-      id: 'a14d8f97-3203-417c-a4a9-5360197e712f',
-      displayName: 'Daniel',
-      userName: '@dboy27',
-      photoUrl: 'https://randomuser.me/api/portraits/men/45.jpg',
-      title: 'ea molestias quasi exercitationem repellat qui ipsa sit aut',
-      content:
-        'et iusto sed quo iure\nvoluptatem occaecati omnis eligendi aut ad\nvoluptatem doloribus vel accusantium quis pariatur\nmolestiae porro eius odio et labore et velit aut',
-      postedOn: '11/02/2020'
-    }
-  ],
-  post: null
+   posts: [],
+   post: null,
+   error: null,
+   pagination: null
 };
 
-const postSlice = createSlice({
-  name: 'posts',
-  initialState,
-  reducers: {
-    detail: (state, { payload }: PayloadAction<{ id: string }>) => {
-      const selectedPost = state.posts.find((post) => post.id === payload.id);
-      if (selectedPost) state.post = selectedPost;
-    },
-    create: (state, { payload }: PayloadAction<IPost>) => {
-      state.posts.push(payload);
-    },
-    edit: (state, { payload }: PayloadAction<IPost>) => {
-      const postToEdit = state.posts.find((post) => post.id === payload.id);
-      if (postToEdit) {
-        postToEdit.displayName = payload.displayName;
-        postToEdit.userName = payload.userName;
-        postToEdit.photoUrl = payload.photoUrl;
-        postToEdit.title = payload.title;
-        postToEdit.content = payload.content;
-      }
-    },
-    delete: (state, { payload }: PayloadAction<{ id: string }>) => {
-      const index = state.posts.findIndex((p) => p.id === payload.id);
-      if (index > -1) state.posts.splice(index, 1);
-    }
-  }
+// Create thunk
+export const fetchPosts = createAsyncThunk<
+   { body: any; headers: any },
+   IPagination,
+   { rejectValue: IErrorResponse }
+>('posts/fetchPost', async (pagination: IPagination, thunkApi) => {
+   try {
+      const posts = await PostService.list(pagination);
+      return posts;
+   } catch (error) {
+      return thunkApi.rejectWithValue(error as IErrorResponse);
+   }
 });
 
-export const {
-  detail: detailPostActionCreator,
-  create: createPostActionCreator,
-  edit: editPostActionCreator,
-  delete: removePostActionCreator
-} = postSlice.actions;
+const postSlice = createSlice({
+   name: 'posts',
+   initialState,
+   reducers: {
+      detailPost: (state, { payload }: PayloadAction<{ id: string }>) => {
+         const selectedPost = state.posts.find((post) => post.id === payload.id);
+         if (selectedPost) state.post = selectedPost;
+      },
+      createPost: (state, { payload }: PayloadAction<IPost>) => {
+         state.posts.push(payload);
+      },
+      editPost: (state, { payload }: PayloadAction<IPost>) => {
+         const postToEdit = state.posts.find((post) => post.id === payload.id);
+         if (postToEdit) {
+            postToEdit.displayName = payload.displayName;
+            postToEdit.userName = payload.userName;
+            postToEdit.photoUrl = payload.photoUrl;
+            postToEdit.title = payload.title;
+            postToEdit.content = payload.content;
+         }
+      },
+      deletePost: (state, { payload }: PayloadAction<{ id: string }>) => {
+         const index = state.posts.findIndex((p) => p.id === payload.id);
+         if (index > -1) state.posts.splice(index, 1);
+      }
+   },
+   extraReducers: (builder) => {
+      builder.addCase(fetchPosts.fulfilled, (state, { payload }) => {
+         state.posts = payload.body;
+         state.pagination = JSON.parse(payload.headers.pagination);
+      });
+      builder.addCase(fetchPosts.rejected, (state, { payload, error }) => {
+         if (payload) {
+            const { data, status, statusText } = payload;
+            state.error = { data, status, statusText };
+         } else if (state.error) state.error.statusText = error.message;
+      });
+   }
+});
+
+export const { createPost, deletePost, detailPost, editPost } = postSlice.actions;
 
 export default postSlice.reducer;

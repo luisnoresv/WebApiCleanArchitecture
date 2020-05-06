@@ -10,14 +10,16 @@ using CleanArchitecture.Application.Posts.Commands.UpdatePost;
 using CleanArchitecture.Application.Posts.Queries.GetPostDetail;
 using CleanArchitecture.Application.Posts.Queries.GetPosts;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.API.Controllers
 {
    public class PostController : ApiController
    {
+      [AllowAnonymous]
       [HttpGet]
-      public async Task<ActionResult<IEnumerable<PostResponse>>> List([FromQuery]PaginationRequest request)
+      public async Task<ActionResult<IEnumerable<PostResponse>>> List([FromQuery] PaginationRequest request)
       {
          var posts = await Mediator.Send(new GetPostsQuery()
          {
@@ -47,7 +49,7 @@ namespace CleanArchitecture.API.Controllers
       }
 
       [HttpGet("{id}")]
-      public async Task<ActionResult<PostResponse>> Detail([FromRoute]Guid id)
+      public async Task<ActionResult<PostResponse>> Detail([FromRoute] Guid id)
       {
          return await Mediator.Send(new GetPostDetailQuery() { Id = id });
       }
@@ -59,14 +61,14 @@ namespace CleanArchitecture.API.Controllers
       }
 
       [HttpPut("{id}")]
-      public async Task<ActionResult<Unit>> Edit([FromRoute]Guid id, UpdatePostCommand command)
+      public async Task<ActionResult<Unit>> Edit([FromRoute] Guid id, UpdatePostCommand command)
       {
          command.Id = id;
          return await Mediator.Send(command);
       }
 
       [HttpDelete("{id}")]
-      public async Task<ActionResult<Unit>> Delete([FromRoute]Guid id)
+      public async Task<ActionResult<Unit>> Delete([FromRoute] Guid id)
       {
          return await Mediator.Send(new DeletePostCommand() { Id = id });
       }

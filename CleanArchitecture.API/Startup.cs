@@ -36,7 +36,7 @@ namespace CleanArchitecture.API
                   {
                      policy.AllowAnyHeader().AllowAnyMethod()
                            // Validate unathorize when token expires for 401 error
-                           .WithExposedHeaders(GlobalConstants.WWW_Authenticate)
+                           .WithExposedHeaders(GlobalConstants.WWW_Authenticate, GlobalConstants.PAGINATION_HEADER)
                            .WithOrigins(GlobalConstants.LOCAL_HOST_DOMAIN);
                   });
             });

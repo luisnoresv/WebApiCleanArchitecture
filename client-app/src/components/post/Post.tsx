@@ -5,7 +5,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { IPost } from '../../app/models/Post';
 // import { detailPostActionCreator, removePostActionCreator } from '../../app/store/redux-toolkit';
-import { detailPostActionCreator, removePostActionCreator } from '../../app/store/reducers/postSlice';
+import { deletePost, detailPost } from '../../app/store/reducers/postSlice';
 
 interface IProps {
    post: IPost;
@@ -15,11 +15,11 @@ const Post: React.FC<IProps> = ({ post }) => {
    const dispatch = useDispatch();
 
    const handlePostDetail = (id: string) => {
-      dispatch(detailPostActionCreator({ id }));
+      dispatch(detailPost({ id }));
    };
 
    const handleRemovePost = (id: string) => {
-      dispatch(removePostActionCreator({ id }));
+      dispatch(deletePost({ id }));
    };
 
    return (
@@ -37,7 +37,7 @@ const Post: React.FC<IProps> = ({ post }) => {
             <Item.Extra>
                <Label>
                   <Icon name='mail' />
-                 Mail
+                  Mail
                </Label>
                <Label icon="globe" content="Additional Languages" />
                <Button onClick={() => handleRemovePost(post.id)} circular color='google plus' icon='remove circle' />

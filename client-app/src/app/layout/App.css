@@ -1,38 +1,30 @@
-.App {
-  text-align: center;
+body {
+   background-color: rgb(234, 234, 234) !important;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.ui.inverted.top.fixed.menu {
+   background-image: linear-gradient( 135deg, rgb(95, 22, 34) 0%, rgb(160, 41, 80) 69%, rgb(218, 64, 64) 89%) !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/*home page styles*/
+
+.masthead {
+   display: flex;
+   align-items: center;
+   background-image: linear-gradient( 135deg, rgb(95, 22, 34) 0%, rgb(160, 41, 80) 69%, rgb(218, 64, 64) 89%) !important;
+   height: 100vh;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.masthead .ui.menu .ui.button, .ui.menu a.ui.inverted.button {
+   margin-left: 0.5em;
 }
 
-.App-link {
-  color: #61dafb;
+.masthead h1.ui.header {
+   font-size: 4em;
+   font-weight: normal;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.masthead h2 {
+   font-size: 1.7em;
+   font-weight: normal;
 }
