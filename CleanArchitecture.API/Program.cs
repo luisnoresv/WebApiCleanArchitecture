@@ -11,42 +11,42 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.API
 {
-   public class Program
-   {
-      public async static Task Main(string[] args)
+  public class Program
+  {
+    public async static Task Main(string[] args)
+    {
+      var host = CreateHostBuilder(args).Build();
+
+      using (var scope = host.Services.CreateScope())
       {
-         var host = CreateHostBuilder(args).Build();
+        var services = scope.ServiceProvider;
+        try
+        {
+          var context = services.GetRequiredService<ApplicationDbContext>();
+          // UserManager
+          var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+          // // Adding Roles
+          var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-         using (var scope = host.Services.CreateScope())
-         {
-            var services = scope.ServiceProvider;
-            try
-            {
-               var context = services.GetRequiredService<ApplicationDbContext>();
-               // UserManager
-               var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-               // // Adding Roles
-               var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-               context.Database.Migrate();
-               // Apply Seed
-               await ApplicationDbContextSeed.SeedData(context, userManager, roleManager);
-            }
-            catch (Exception ex)
-            {
-               var logger = services.GetRequiredService<ILogger<Program>>();
-               logger.LogError(ex, "An error ocurring during migration");
-            }
-         }
-
-         await host.RunAsync();
+          context.Database.Migrate();
+          // Apply Seed
+          await ApplicationDbContextSeed.SeedData(context, userManager, roleManager);
+        }
+        catch (Exception ex)
+        {
+          var logger = services.GetRequiredService<ILogger<Program>>();
+          logger.LogError(ex, "An error ocurring during migration");
+        }
       }
 
-      public static IHostBuilder CreateHostBuilder(string[] args) =>
-         Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-               webBuilder.UseStartup<Startup>();
-            });
-   }
+      await host.RunAsync();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+       Host.CreateDefaultBuilder(args)
+          .ConfigureWebHostDefaults(webBuilder =>
+          {
+            webBuilder.UseStartup<Startup>();
+          });
+  }
 }

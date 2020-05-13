@@ -12,20 +12,20 @@ import store from './app/store/store';
 const history = createBrowserHistory();
 
 const render = () => {
-   const App = require('./app/layout/App').default;
+  const App = require('./app/layout/App').default;
 
-   const app = (
-      <Router history={history}>
-         <Provider store={store}>
-            <App />
-         </Provider>
-      </Router>
-   );
+  const app = (
+    <Router history={history}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </Router>
+  );
 
-   ReactDOM.render(
-      app,
-      document.getElementById('root')
-   );
+  ReactDOM.render(
+    app,
+    document.getElementById('root')
+  );
 };
 
 render();
@@ -36,7 +36,7 @@ render();
 // serviceWorker.unregister();
 
 if (process.env.NODE_ENV === 'development' && module.hot) {
-   module.hot.accept('./app/layout/App', render);
+  module.hot.accept('./app/layout/App', render);
 }
 
 export default history;

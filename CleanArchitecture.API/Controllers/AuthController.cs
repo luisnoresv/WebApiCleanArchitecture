@@ -7,34 +7,34 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.API.Controllers
 {
-   [Route("api/[controller]")]
-   [ApiController]
-   public class AuthController : ControllerBase
-   {
-      private readonly IIdentityService _identityService;
-      public AuthController(IIdentityService identityService)
-      {
-         _identityService = identityService;
-      }
+  [Route("api/[controller]")]
+  [ApiController]
+  public class AuthController : ControllerBase
+  {
+    private readonly IIdentityService _identityService;
+    public AuthController(IIdentityService identityService)
+    {
+      _identityService = identityService;
+    }
 
-      [HttpGet]
-      public async Task<ActionResult<UserResponse>> GetCurrentUser()
-      {
-         return await _identityService.GetCurrentUser();
-      }
+    [HttpGet]
+    public async Task<ActionResult<UserResponse>> GetCurrentUser()
+    {
+      return await _identityService.GetCurrentUser();
+    }
 
-      [AllowAnonymous]
-      [HttpPost("login")]
-      public async Task<ActionResult<UserResponse>> Login([FromBody]LoginUserRequest request)
-      {
-         return await _identityService.Login(request);
-      }
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<ActionResult<UserResponse>> Login([FromBody] LoginUserRequest request)
+    {
+      return await _identityService.Login(request);
+    }
 
-      [AllowAnonymous]
-      [HttpPost("register")]
-      public async Task<ActionResult<UserResponse>> Register([FromBody]RegisterUserRequest request)
-      {
-         return await _identityService.Register(request);
-      }
-   }
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<ActionResult<UserResponse>> Register([FromBody] RegisterUserRequest request)
+    {
+      return await _identityService.Register(request);
+    }
+  }
 }

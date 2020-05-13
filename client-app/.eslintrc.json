@@ -46,7 +46,8 @@
       "no-trailing-spaces": "warn",
       "object-curly-newline": "off",
       "react/jsx-indent-props": "off",
-      "consistent-return": "off"
+      "consistent-return": "off",
+      "react/self-closing-comp": "warn"
    },
    "settings": {
       "import/resolver": {
