@@ -8,47 +8,47 @@ using NUnit.Framework;
 
 namespace CleanArchitecture.IntegrationTest.Posts.Commands
 {
-   using static SetupTestEnvironment;
+  using static SetupTestEnvironment;
 
-   public class CreatePostTests : TestBase
-   {
-      [Test]
-      public async Task ShouldRequireMinimunFields()
+  public class CreatePostTests : TestBase
+  {
+    [Test]
+    public async Task ShouldRequireMinimunFields()
+    {
+      await RunAsDefaultUserAsync();
+
+      var command = new CreatePostCommand();
+
+      FluentActions.Invoking(() => SendAsync(command))
+        .Should().Throw<ValidationException>();
+    }
+
+    [Test]
+    public async Task ShouldCreatePost()
+    {
+      var currentUserName = await RunAsDefaultUserAsync();
+
+      var command = new CreatePostCommand
       {
-         await RunAsDefaultUserAsync();
+        DisplayName = "Test1",
+        UserName = "postUserName",
+        PhotoUrl = "someUrl",
+        Title = "Test for Create",
+        Content = "Create command Test"
+      };
 
-         var command = new CreatePostCommand();
+      var postId = await SendAsync(command);
 
-         FluentActions.Invoking(() => SendAsync(command))
-            .Should().Throw<ValidationException>();
-      }
+      var newPost = await FindAsync<Post>(postId);
 
-      [Test]
-      public async Task ShouldCreatePost()
-      {
-         var currentUserName = await RunAsDefaultUserAsync();
-
-         var command = new CreatePostCommand
-         {
-            DisplayName = "Test1",
-            UserName = "postUserName",
-            PhotoUrl = "someUrl",
-            Title = "Test for Create",
-            Content = "Create command Test"
-         };
-
-         var postId = await SendAsync(command);
-
-         var newPost = await FindAsync<Post>(postId);
-
-         newPost.Should().NotBeNull();
-         newPost.DisplayName.Should().Be(command.DisplayName);
-         newPost.UserName.Should().Be(command.UserName);
-         newPost.PhotoUrl.Should().Be(command.PhotoUrl);
-         newPost.Title.Should().Be(command.Title);
-         newPost.Content.Should().Be(command.Content);
-         newPost.Created.Should().BeCloseTo(DateTime.Now, 1000);
-         newPost.CreatedBy.Should().Be(currentUserName);
-      }
-   }
+      newPost.Should().NotBeNull();
+      newPost.DisplayName.Should().Be(command.DisplayName);
+      newPost.UserName.Should().Be(command.UserName);
+      newPost.PhotoUrl.Should().Be(command.PhotoUrl);
+      newPost.Title.Should().Be(command.Title);
+      newPost.Content.Should().Be(command.Content);
+      newPost.Created.Should().BeCloseTo(DateTime.Now, 1000);
+      newPost.CreatedBy.Should().Be(currentUserName);
+    }
+  }
 }

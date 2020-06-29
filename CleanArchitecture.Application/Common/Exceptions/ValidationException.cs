@@ -6,28 +6,28 @@ using FluentValidation.Results;
 
 namespace CleanArchitecture.Application.Common.Exceptions
 {
-   public class ValidationException : Exception
-   {
-      public IDictionary<string, string[]> Errors { get; }
+  public class ValidationException : Exception
+  {
+    public IDictionary<string, string[]> Errors { get; }
 
-      public ValidationException() : base(GlobalConstants.DEFAULT_VALIDATION_MESSAGE)
+    public ValidationException() : base(GlobalConstants.DEFAULT_VALIDATION_MESSAGE)
+    {
+      Errors = new Dictionary<string, string[]>();
+    }
+
+    public ValidationException(IEnumerable<ValidationFailure> failures)
+          : this()
+    {
+      var failureGroups = failures
+          .GroupBy(e => e.PropertyName, e => e.ErrorMessage);
+
+      foreach (var failureGroup in failureGroups)
       {
-         Errors = new Dictionary<string, string[]>();
+        var propertyName = failureGroup.Key;
+        var propertyFailures = failureGroup.ToArray();
+
+        Errors.Add(propertyName, propertyFailures);
       }
-
-      public ValidationException(IEnumerable<ValidationFailure> failures)
-            : this()
-      {
-         var failureGroups = failures
-             .GroupBy(e => e.PropertyName, e => e.ErrorMessage);
-
-         foreach (var failureGroup in failureGroups)
-         {
-            var propertyName = failureGroup.Key;
-            var propertyFailures = failureGroup.ToArray();
-
-            Errors.Add(propertyName, propertyFailures);
-         }
-      }
-   }
+    }
+  }
 }

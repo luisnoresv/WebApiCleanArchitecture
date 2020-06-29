@@ -9,42 +9,42 @@ using NUnit.Framework;
 
 namespace CleanArchitecture.IntegrationTest.Posts.Commands
 {
-   using static SetupTestEnvironment;
+  using static SetupTestEnvironment;
 
-   public class DeletePostTests : TestBase
-   {
-      [Test]
-      public async Task ShouldRequireMinimunFields()
+  public class DeletePostTests : TestBase
+  {
+    [Test]
+    public async Task ShouldRequireMinimunFields()
+    {
+      await RunAsDefaultUserAsync();
+      var command = new DeletePostCommand();
+
+      FluentActions.Invoking(() => SendAsync(command))
+        .Should().Throw<ValidationException>();
+    }
+
+    [Test]
+    public async Task ShouldDeleteSelectedPost()
+    {
+      await RunAsDefaultUserAsync();
+
+      var postId = await SendAsync(new CreatePostCommand
       {
-         await RunAsDefaultUserAsync();
-         var command = new DeletePostCommand();
+        DisplayName = "userName",
+        UserName = "postUserName",
+        PhotoUrl = "someUrl",
+        Title = "Test for Delete",
+        Content = "Delete command Test"
+      });
 
-         FluentActions.Invoking(() => SendAsync(command))
-            .Should().Throw<ValidationException>();
-      }
-
-      [Test]
-      public async Task ShouldDeleteSelectedPost()
+      await SendAsync(new DeletePostCommand
       {
-         await RunAsDefaultUserAsync();
+        Id = postId
+      });
 
-         var postId = await SendAsync(new CreatePostCommand
-         {
-            DisplayName = "userName",
-            UserName = "postUserName",
-            PhotoUrl = "someUrl",
-            Title = "Test for Delete",
-            Content = "Delete command Test"
-         });
+      var list = await FindAsync<Post>(postId);
 
-         await SendAsync(new DeletePostCommand
-         {
-            Id = postId
-         });
-
-         var list = await FindAsync<Post>(postId);
-
-         list.Should().BeNull();
-      }
-   }
+      list.Should().BeNull();
+    }
+  }
 }
